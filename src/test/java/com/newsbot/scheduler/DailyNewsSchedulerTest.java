@@ -136,7 +136,7 @@ class DailyNewsSchedulerTest {
         NewsArticle article2 = createTestArticle(2L);
         NewsArticle article3 = createTestArticle(3L);
         List<NewsArticle> allArticles = List.of(article1, article2, article3);
-        List<NewsArticle> successfulArticles = List.of(article1, article3); // Only article1 and article3 were successfully sent
+        List<NewsArticle> successfulArticles = List.of(article1, article3);
 
         when(rssNewsService.fetchAllNews()).thenReturn(Flux.fromIterable(allArticles));
         when(newsFilterService.filterDuplicates(any(NewsArticle.class))).thenAnswer(i -> Mono.just(i.getArgument(0)));

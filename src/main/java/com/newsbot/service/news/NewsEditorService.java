@@ -55,7 +55,7 @@ public class NewsEditorService {
         return evaluateNewsSequentially(allArticles)
                 .collectList()
                 .map(this::selectBestNews)
-                .timeout(Duration.ofMinutes(10))  // Timeout global para todo o processo
+                .timeout(Duration.ofMinutes(10))
                 .doOnError(e -> {
                     if (e instanceof java.util.concurrent.TimeoutException) {
                         log.error("Timeout global (10 minutos) ao avaliar artigos. Usando seleção alternativa.");
@@ -85,7 +85,7 @@ public class NewsEditorService {
         log.info("Processando todos os {} artigos de uma vez", articles.size());
 
         return evaluateBatchWithRetry(articles)
-                .timeout(Duration.ofSeconds(180)) // 3 minutos de timeout para todos os artigos
+                .timeout(Duration.ofSeconds(180))
                 .doOnError(e -> {
                     if (e instanceof java.util.concurrent.TimeoutException) {
                         log.error("Timeout (180s) ao processar todos os {} artigos", articles.size());
@@ -141,7 +141,7 @@ public class NewsEditorService {
         return Mono.fromCallable(() -> buildPrompt(batch))
                 .flatMap(prompt -> Mono.defer(() -> callChatApi(prompt))
                         .subscribeOn(Schedulers.boundedElastic())
-                        .timeout(Duration.ofSeconds(45))  // Timeout específico para a chamada à API
+                        .timeout(Duration.ofSeconds(45))
                         .doOnError(e -> {
                             if (e instanceof java.util.concurrent.TimeoutException) {
                                 log.error("Timeout (45s) na chamada à API para lote de {} artigos", batch.size());
@@ -152,10 +152,10 @@ public class NewsEditorService {
                     List<NewsEvaluation> evaluations = parseEvaluationResponse(response, batch);
                     return evaluations;
                 })
-                .timeout(Duration.ofSeconds(50))  // Timeout global para todo o processamento do lote
+                .timeout(Duration.ofSeconds(50))
                 .onErrorResume(e -> {
                     if (e instanceof InterruptedException) {
-                        Thread.currentThread().interrupt(); // respect cancellation
+                        Thread.currentThread().interrupt();
                     }
 
                     if (e instanceof java.util.concurrent.TimeoutException) {
@@ -215,7 +215,7 @@ public class NewsEditorService {
                 Thread.currentThread().interrupt();
             }
             log.warn("Falha na chamada à API de IA, retornando resposta vazia: {}", e.getMessage());
-            return Mono.just(""); // Retorna string vazia que será tratada pelo parseEvaluationResponse
+            return Mono.just("");
         });
     }
 
