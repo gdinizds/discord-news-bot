@@ -1,0 +1,103 @@
+spring:
+  application:
+    name: discord-news-bot
+  config:
+    import: "vault://"
+  cloud:
+    vault:
+      uri: ${SPRING_CLOUD_VAULT_URI}
+      token: ${SPRING_CLOUD_VAULT_TOKEN}
+      scheme: http
+      kv:
+        enabled: true
+        backend: secret
+        default-context: discord-news-bot
+      authentication: token
+      enabled: false
+  r2dbc:
+    url: r2dbc:postgresql://localhost:5432/newsbot
+    username: newsbot_run
+    password: ${database.password:senha123}
+  data:
+    r2dbc:
+      repositories:
+        enabled: true
+  http:
+    client:
+      connect-timeout: 60s
+      read-timeout: 120s
+  ai:
+    openai:
+      api-key: ${openai.api-key}
+      chat:
+        options:
+          model: gpt-4o-mini
+          temperature: 0.7
+        completions-path: /v1/chat/completions
+        base-url: https://api.openai.com
+server:
+  port: 8443
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: when-authorized
+logging:
+  level:
+    com.newsbot: DEBUG
+    org.springframework.r2dbc: DEBUG
+app:
+  discord:
+    webhook-url: ${DISCORD_URL}
+    embed-color: 3447003
+    max-embeds-per-message: 10
+    max-description-length: 400
+  news:
+    top-news-count: 10
+    rss-feeds:
+      - url: "https://www.theverge.com/rss/index.xml"
+        name: "The Verge"
+      - url: "https://techcrunch.com/feed/"
+        name: "TechCrunch"
+      - url: "https://feeds.feedburner.com/omgubuntu"
+        name: "OMG Ubuntu"
+      - url: "https://www.polygon.com/rss/index.xml"
+        name: "Polygon"
+      - url: "https://www.pcgamer.com/rss/"
+        name: "PC Gamer"
+      - url: "https://arstechnica.com/feed/"
+        name: "Ars Technica"
+      - url: "https://rss.slashdot.org/Slashdot/slashdotMain"
+        name: "Slashdot"
+      - url: "https://www.engadget.com/rss.xml"
+        name: "Engadget"
+      - url: "https://www.wired.com/feed/rss"
+        name: "Wired"
+      - url: "https://feeds.feedburner.com/Gizmodo"
+        name: "Gizmodo"
+      - url: "https://feeds.feedburner.com/LinuxAddicts"
+        name: "Linux Addicts"
+      - url: "https://www.zdnet.com/news/rss.xml"
+        name: "ZDNet"
+      - url: "https://www.bleepingcomputer.com/feed/"
+        name: "Bleeping Computer"
+      - url: "https://www.securityweek.com/feed/"
+        name: "Security Week"
+      - url: "https://feeds.arstechnica.com/arstechnica/security"
+        name: "Ars Technica Security"
+      - url: "https://www.gamespot.com/feeds/mashup/"
+        name: "GameSpot"
+      - url: "https://kotaku.com/rss"
+        name: "Kotaku"
+      - url: "https://feeds.feedburner.com/rockpapershotgun"
+        name: "Rock Paper Shotgun"
+      - url: "https://www.reddit.com/r/technology/.rss"
+        name: "Reddit - Technology"
+      - url: "https://www.reddit.com/r/linux/.rss"
+        name: "Reddit - Linux"
+
+  similarity:
+    threshold: 0.6
