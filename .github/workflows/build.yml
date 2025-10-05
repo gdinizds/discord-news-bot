@@ -1,0 +1,66 @@
+name: Build and Release Java Application
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  release:
+    types: [ created ]
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build and Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v4
+
+      - name: Configurar JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+          cache: 'gradle'
+
+      - name: Permitir execução do Gradle Wrapper
+        run: chmod +x gradlew
+
+      - name: Build + Testes (Gradle)
+        run: ./gradlew clean build --stacktrace
+
+      - name: Upload do artefato JAR
+        uses: actions/upload-artifact@v4
+        with:
+          name: discord-news-bot
+          path: build/libs/*.jar
+
+  release:
+    name: Publicar Release
+    needs: build
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/')
+
+    permissions:
+      contents: write
+
+    steps:
+      - name: Baixar artefato do build
+        uses: actions/download-artifact@v4
+        with:
+          name: discord-news-bot
+          path: build/libs/
+
+      - name: Criar ou atualizar Release no GitHub
+        uses: softprops/action-gh-release@v2
+        with:
+          files: build/libs/*.jar
+          generate_release_notes: true
+          draft: false
+          prerelease: false
+          fail_on_unmatched_files: false
+          overwrite_files: true
