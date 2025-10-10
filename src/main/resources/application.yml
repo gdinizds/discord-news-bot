@@ -1,42 +1,28 @@
 spring:
   application:
     name: discord-news-bot
-  config:
-    import: "vault://"
-  cloud:
-    vault:
-      uri: ${SPRING_CLOUD_VAULT_URI}
-      token: ${SPRING_CLOUD_VAULT_TOKEN}
-      scheme: http
-      kv:
-        enabled: true
-        backend: secret
-        default-context: discord-news-bot
-      authentication: token
-      enabled: false
-  r2dbc:
-    url: r2dbc:postgresql://localhost:5432/newsbot
-    username: newsbot_run
-    password: ${database.password:senha123}
-  data:
-    r2dbc:
-      repositories:
-        enabled: true
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:local}
   http:
     client:
       connect-timeout: 60s
       read-timeout: 120s
+  data:
+    r2dbc:
+      repositories:
+        enabled: true
   ai:
     openai:
-      api-key: ${openai.api-key}
       chat:
         options:
           model: gpt-4o-mini
           temperature: 0.7
         completions-path: /v1/chat/completions
         base-url: https://api.openai.com
+
 server:
   port: 8443
+
 management:
   endpoints:
     web:
@@ -45,13 +31,14 @@ management:
   endpoint:
     health:
       show-details: when-authorized
+
 logging:
   level:
     com.newsbot: DEBUG
     org.springframework.r2dbc: DEBUG
+
 app:
   discord:
-    webhook-url: ${DISCORD_URL}
     embed-color: 3447003
     max-embeds-per-message: 10
     max-description-length: 400
