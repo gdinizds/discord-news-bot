@@ -19,6 +19,3 @@ spring:
 app:
   discord:
     webhook-url: ${DISCORD_WEBHOOK_URL:}
-
-# Local overrides for any other secrets or endpoints can be provided via
-# environment variables or this profile-specific file without relying on Vault.

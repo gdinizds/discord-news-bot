@@ -26,9 +26,3 @@ spring:
         lifecycle:
           enabled: true
 
-# Secrets expected from Vault (stored under secret/discord-news-bot/prod):
-#   spring.r2dbc.url
-#   spring.r2dbc.username
-#   spring.r2dbc.password
-#   spring.ai.openai.api-key
-#   app.discord.webhook-url
